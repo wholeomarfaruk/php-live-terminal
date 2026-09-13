@@ -36,6 +36,38 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 
 /*
 |--------------------------------------------------------------------------
+| PHP 7.4 Compatibility Polyfills
+|--------------------------------------------------------------------------
+| str_starts_with() / str_ends_with() / str_contains() were added in
+| PHP 8.0. These polyfills let this file run unmodified on PHP 7.4
+| (ea-php74) while still using the native functions on PHP 8.x.
+|--------------------------------------------------------------------------
+*/
+
+if (!function_exists('str_starts_with')) {
+    function str_starts_with(string $haystack, string $needle): bool
+    {
+        return $needle === '' || strncmp($haystack, $needle, strlen($needle)) === 0;
+    }
+}
+
+if (!function_exists('str_ends_with')) {
+    function str_ends_with(string $haystack, string $needle): bool
+    {
+        return $needle === '' || substr($haystack, -strlen($needle)) === $needle;
+    }
+}
+
+if (!function_exists('str_contains')) {
+    function str_contains(string $haystack, string $needle): bool
+    {
+        return $needle === '' || strpos($haystack, $needle) !== false;
+    }
+}
+
+
+/*
+|--------------------------------------------------------------------------
 | JSON Headers
 |--------------------------------------------------------------------------
 */
@@ -82,7 +114,7 @@ function sendResponse(
     string $error = '',
     int $code = 0,
     ?string $cwd = null
-): never {
+) {
 
     while (ob_get_level() > 0) {
         ob_end_clean();
